@@ -6,12 +6,16 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use SamuelPouzet\Api\Adapter\Result;
 use SamuelPouzet\Api\Service\AuthenticationService;
+use SamuelPouzet\Api\Service\JWTService;
 
 // todo override with abstract jsons controller
 class AuthController extends AbstractActionController
 {
 
-    public function __construct(protected AuthenticationService $authenticationService)
+    public function __construct(
+        protected AuthenticationService $authenticationService,
+        protected JWTService            $JWTService
+    )
     {
 
     }
@@ -29,10 +33,19 @@ class AuthController extends AbstractActionController
             ]);
         }
 
+        // TOKEN AUTH
+        $jwt = $this
+            ->JWTService
+            ->expiresAt(new \DateInterval('PT1H'))
+            ->addClaim('login', $posted['login'])
+            ->generate()
+            ->toString();
+
         return new JsonModel([
-            'login'=>$posted['login'],
-            'password'=>$posted['password'],
-            'granted'=>$granted->getMessage(),
+            'login' => $posted['login'],
+            'password' => $posted['password'],
+            'granted' => $granted->getMessage(),
+            'jwt' => $jwt
         ]);
     }
 

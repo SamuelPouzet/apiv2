@@ -18,6 +18,7 @@ use SamuelPouzet\Api\Service\AuthorisationService;
 use SamuelPouzet\Api\Service\Factory\AuthenticationServiceFactory;
 use SamuelPouzet\Api\Service\Factory\AuthorisationServiceFactory;
 use Application\Controller\IndexController;
+use SamuelPouzet\Api\Service\JWTService;
 
 return [
     'router' => [
@@ -52,10 +53,12 @@ return [
             ApiListener::class => ApiListenerFactory::class,
             AuthenticationService::class => AuthenticationServiceFactory::class,
             AuthorisationService::class => AuthorisationServiceFactory::class,
+            JWTService::class => InvokableFactory::class,
         ],
         'aliases' => [
             'authorization.service' => AuthorisationService::class,
             'authentication.service' => AuthenticationService::class,
+            'jwt.service' => JWTService::class,
         ],
     ],
     'listeners' => [
