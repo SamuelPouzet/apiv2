@@ -18,6 +18,7 @@ use SamuelPouzet\Api\Service\AuthorisationService;
 use SamuelPouzet\Api\Service\Factory\AuthenticationServiceFactory;
 use SamuelPouzet\Api\Service\Factory\AuthorisationServiceFactory;
 use Application\Controller\IndexController;
+use SamuelPouzet\Api\Service\Factory\JWTServiceFactory;
 use SamuelPouzet\Api\Service\JWTService;
 
 return [
@@ -53,7 +54,7 @@ return [
             ApiListener::class => ApiListenerFactory::class,
             AuthenticationService::class => AuthenticationServiceFactory::class,
             AuthorisationService::class => AuthorisationServiceFactory::class,
-            JWTService::class => InvokableFactory::class,
+            JWTService::class => JWTServiceFactory::class,
         ],
         'aliases' => [
             'authorization.service' => AuthorisationService::class,
@@ -68,6 +69,14 @@ return [
         'strategies' => [
             'ViewJsonStrategy',
         ],
+    ],
+    'jwt' => [
+        'payload' => 'mhuiguygyukvykhkjvttgyhjkkknhuukjbb',
+        'tokenId' => 'crimson-auth',
+        'issuedBy' => 'api.masterforum.sam',
+        'permittedFor' => 'masterforum.sam',
+        'relatedTo' => 'component-sam',
+        
     ],
     'doctrine' => [
         'migrations_configuration' => [

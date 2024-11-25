@@ -20,19 +20,19 @@ class JWTService
     protected Hmac $algorithm;
     protected Key $signingKey;
 
-    public function __construct()
+    public function __construct(protected array $config)
     {
         $this->setTokenBuilder(new Builder(new JoseEncoder(), ChainedFormatter::default()));
         $this->setAlgorithm(new Sha256());
-        $this->setSigningKey(InMemory::base64Encoded('mBC5v1sOKVvbdEitdSBenu59nfNfhwkedkJVNabosTw='));
+        $this->setSigningKey(InMemory::base64Encoded($this->config['payload'] ?? 'mBC5v1sOKVvbdEitdSBenu59nfNfhwkedkJVNabosTw='));
 
-        $this->tokenBuilder->identifiedBy('purple-auth')
+        $this->tokenBuilder->identifiedBy( $config['tokenId'] ?? 'purple-auth')
             // Configures the issuer (iss claim)
-            ->issuedBy('http://example.com')
+            ->issuedBy($config['issuedBy'] ?? 'https://example.com')
             // Configures the audience (aud claim)
-            ->permittedFor('http://example.org')
+            ->permittedFor($config['permittedFor'] ?? 'http://example.org')
             // Configures the subject of the token (sub claim)
-            ->relatedTo('component1')
+            ->relatedTo($config['relatedTo'] ?? 'component1')
             ->issuedAt(new \DateTimeImmutable());
     }
 

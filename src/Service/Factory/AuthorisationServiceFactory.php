@@ -17,6 +17,5 @@ class AuthorisationServiceFactory implements FactoryInterface
     protected function getAuthorization(array $config): array
     {
         return $config['authorization'] ?? [];
-
     }
 }

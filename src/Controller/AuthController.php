@@ -34,6 +34,7 @@ class AuthController extends AbstractActionController
         }
 
         // TOKEN AUTH
+        //todo refresh token + stoquage en cookie
         $jwt = $this
             ->JWTService
             ->expiresAt(new \DateInterval('PT1H'))
