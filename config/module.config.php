@@ -15,6 +15,7 @@ use SamuelPouzet\Api\Listener\Factory\ApiListenerFactory;
 use SamuelPouzet\Api\Plugin\PostFromHeaderPlugin;
 use SamuelPouzet\Api\Service\AuthenticationService;
 use SamuelPouzet\Api\Service\AuthorisationService;
+use SamuelPouzet\Api\Service\CookieService;
 use SamuelPouzet\Api\Service\Factory\AuthenticationServiceFactory;
 use SamuelPouzet\Api\Service\Factory\AuthorisationServiceFactory;
 use Application\Controller\IndexController;
@@ -54,12 +55,15 @@ return [
             ApiListener::class => ApiListenerFactory::class,
             AuthenticationService::class => AuthenticationServiceFactory::class,
             AuthorisationService::class => AuthorisationServiceFactory::class,
+            // todo cookieservicefactory pour récupérer de la conf
+            CookieService::class => InvokableFactory::class,
             JWTService::class => JWTServiceFactory::class,
         ],
         'aliases' => [
             'authorization.service' => AuthorisationService::class,
             'authentication.service' => AuthenticationService::class,
             'jwt.service' => JWTService::class,
+            'cookie.service' => CookieService::class,
         ],
     ],
     'listeners' => [

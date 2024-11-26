@@ -41,9 +41,9 @@ class JWTService
         return $this->tokenBuilder;
     }
 
-    public function expiresAt(\DateInterval $interval): static
+    public function expiresAt(\DateTimeImmutable $date): static
     {
-        $this->tokenBuilder->expiresAt((new \DateTimeImmutable())->add($interval));
+        $this->tokenBuilder->expiresAt($date);
         return $this;
     }
 
