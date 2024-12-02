@@ -33,16 +33,15 @@ class ApiListener
         $method = $this->getAction($event);
         $controller = $routeMatch->getParam('controller');
         $routeMatch->setParam('action', $method);
-
         try {
-            $this->authorize($controller, $method);
+            $this->authorize($event);
         } catch (\Exception $e) {
             die('Exception ' . $e->getMessage());
         } catch (\Error $e) {
             die('Erreur ' . $e->getMessage());
         }
 
-        $routeMatch->setParam('action', $method);
+
     }
 
     protected function getAction(MvcEvent $event): string
@@ -60,8 +59,8 @@ class ApiListener
         return $method;
     }
 
-    protected function authorize(string $controller, string $action)
+    protected function authorize(MvcEvent $event)
     {
-        $allowed = $this->authorisationService->authorize($controller, $action);
+        $allowed = $this->authorisationService->authorize($event);
     }
 }

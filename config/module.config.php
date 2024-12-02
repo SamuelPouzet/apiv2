@@ -8,10 +8,15 @@ use Laminas\Router\Http\Literal;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use SamuelPouzet\Api\Controller\AuthController;
 use SamuelPouzet\Api\Controller\Factory\AuthControllerFactory;
+use SamuelPouzet\Api\Controller\TestController;
 use SamuelPouzet\Api\Entity\User;
 use SamuelPouzet\Api\Interface\UserInterface;
 use SamuelPouzet\Api\Listener\ApiListener;
 use SamuelPouzet\Api\Listener\Factory\ApiListenerFactory;
+use SamuelPouzet\Api\Manager\AuthTokenManager;
+use SamuelPouzet\Api\Manager\Factory\AuthTokenManagerFactory;
+use SamuelPouzet\Api\Manager\Factory\RefreshTokenManagerFactory;
+use SamuelPouzet\Api\Manager\RefreshTokenManager;
 use SamuelPouzet\Api\Plugin\PostFromHeaderPlugin;
 use SamuelPouzet\Api\Service\AuthenticationService;
 use SamuelPouzet\Api\Service\AuthorisationService;
@@ -20,11 +25,25 @@ use SamuelPouzet\Api\Service\Factory\AuthenticationServiceFactory;
 use SamuelPouzet\Api\Service\Factory\AuthorisationServiceFactory;
 use Application\Controller\IndexController;
 use SamuelPouzet\Api\Service\Factory\JWTServiceFactory;
+use SamuelPouzet\Api\Service\Factory\RoleServiceFactory;
+use SamuelPouzet\Api\Service\Factory\UserServiceFactory;
 use SamuelPouzet\Api\Service\JWTService;
+use SamuelPouzet\Api\Service\RoleService;
+use SamuelPouzet\Api\Service\UserService;
 
 return [
     'router' => [
         'routes' => [
+            'test' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/test',
+                    'defaults' => [
+                        'controller' => TestController::class,
+                        'action' => 'index',
+                    ],
+                ],
+            ],
             'auth' => [
                 'type' => Literal::class,
                 'options' => [
@@ -34,12 +53,13 @@ return [
                         'action' => 'index',
                     ],
                 ],
-            ]
-        ]
+            ],
+        ],
     ],
     'controllers' => [
         'factories' => [
             AuthController::class => AuthControllerFactory::class,
+            TestController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -58,12 +78,22 @@ return [
             // todo cookieservicefactory pour récupérer de la conf
             CookieService::class => InvokableFactory::class,
             JWTService::class => JWTServiceFactory::class,
+            RoleService::class => RoleServiceFactory::class,
+            UserService::class => UserServiceFactory::class,
+
+            AuthTokenManager::class => AuthTokenManagerFactory::class,
+            RefreshTokenManager::class => RefreshTokenManagerFactory::class,
         ],
         'aliases' => [
             'authorization.service' => AuthorisationService::class,
             'authentication.service' => AuthenticationService::class,
             'jwt.service' => JWTService::class,
             'cookie.service' => CookieService::class,
+            'user.service' => UserService::class,
+            'role.service' => RoleService::class,
+
+            'auth.token.manager' => AuthTokenManager::class,
+            'refresh.token.manager' => RefreshTokenManager::class,
         ],
     ],
     'listeners' => [
@@ -139,10 +169,16 @@ return [
         'controllers' => [
             IndexController::class => [
                 'getAll' => [
-                    'allowed' => false,
+                    'public' => true,
                     'roles' => ['role.admin'],
                 ],
             ],
+            TestController::class => [
+                'getAll' => [
+                    'public' => false,
+                    'roles' => ['role.modo'],
+                ],
+            ]
         ],
     ],
 ];

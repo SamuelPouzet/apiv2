@@ -3,78 +3,73 @@
 namespace SamuelPouzet\Api\Service;
 
 use Lcobucci\JWT\Builder as BuilderInterface;
+use Lcobucci\JWT\Token;
 use Lcobucci\JWT\Token\Builder;
 use Lcobucci\JWT\Signer\Hmac;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
-use Lcobucci\JWT\Signer;
+use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Token\Plain;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use Lcobucci\JWT\Validation\Validator;
 
 class JWTService
 {
-
-    protected BuilderInterface $tokenBuilder;
+    /**
+     * @var Hmac
+     */
     protected Hmac $algorithm;
     protected Key $signingKey;
 
     public function __construct(protected array $config)
     {
-        $this->setTokenBuilder(new Builder(new JoseEncoder(), ChainedFormatter::default()));
-        $this->setAlgorithm(new Sha256());
-        $this->setSigningKey(InMemory::base64Encoded($this->config['payload'] ?? 'mBC5v1sOKVvbdEitdSBenu59nfNfhwkedkJVNabosTw='));
+        $this->signingKey =
+            InMemory::base64Encoded($this->config['payload'] ?? 'mBC5v1sOKVvbdEitdSBenu59nfNfhwkedkJVNabosTw=')
+        ;
 
-        $this->tokenBuilder->identifiedBy( $config['tokenId'] ?? 'purple-auth')
-            // Configures the issuer (iss claim)
+        $this->algorithm = new Sha256();
+    }
+
+    public function build(\DateTimeImmutable $expirationDate, array $claims = [], array $headers = []): Plain
+    {
+        /**
+         * @var BuilderInterface
+         */
+         $tokenBuilder = new Builder(new JoseEncoder(), ChainedFormatter::default());
+
+
+        foreach ($claims as $key => $value) {
+            $tokenBuilder->withClaim($key, $value);
+        }
+
+        foreach ($headers as $key => $value) {
+            $tokenBuilder->withHeader($key, $value);
+        }
+
+        $tokenBuilder
+            ->expiresAt($expirationDate)
+            ->identifiedBy($config['tokenId'] ?? 'purple-auth')
             ->issuedBy($config['issuedBy'] ?? 'https://example.com')
-            // Configures the audience (aud claim)
             ->permittedFor($config['permittedFor'] ?? 'http://example.org')
-            // Configures the subject of the token (sub claim)
             ->relatedTo($config['relatedTo'] ?? 'component1')
             ->issuedAt(new \DateTimeImmutable());
+
+        return $tokenBuilder->getToken($this->algorithm, $this->signingKey);
     }
 
-    public function getTokenBuilder(): BuilderInterface
+    public function readJwt(string $tokenContent): ?Token
     {
-        return $this->tokenBuilder;
-    }
+        $parser = new Parser(new JoseEncoder());
+        $token = $parser->parse($tokenContent);
 
-    public function expiresAt(\DateTimeImmutable $date): static
-    {
-        $this->tokenBuilder->expiresAt($date);
-        return $this;
+        $validator = new Validator();
+        if ($validator->validate($token, new SignedWith($this->algorithm, $this->signingKey))) {
+            return $token;
+        }
+        return null;
     }
-
-    public function addClaim(string $name, string $value): static
-    {
-        $this->tokenBuilder->withClaim($name, $value);
-        return $this;
-    }
-
-    public function generate(): Plain
-    {
-        return $this->tokenBuilder->getToken($this->algorithm, $this->signingKey);
-    }
-
-    public function setTokenBuilder(BuilderInterface $tokenBuilder): static
-    {
-        $this->tokenBuilder = $tokenBuilder;
-        return $this;
-    }
-
-    public function setAlgorithm(Hmac $algorithm): static
-    {
-        $this->algorithm = $algorithm;
-        return $this;
-    }
-
-    public function setSigningKey(Key $signingKey): static
-    {
-        $this->signingKey = $signingKey;
-        return $this;
-    }
-
 
 }

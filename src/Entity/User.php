@@ -2,6 +2,7 @@
 
 namespace SamuelPouzet\Api\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 
 #[ORM\Entity(readOnly: false)]
 #[ORM\Table(name: 'user')]
@@ -20,6 +21,17 @@ class User
 
     #[ORM\Column(name: 'mail')]
     protected string $mail;
+
+    #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: "users")]
+    #[ORM\JoinTable(name: "user_role")]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id")]
+    #[ORM\InverseJoinColumn(name: "role_id", referencedColumnName: "id")]
+    private PersistentCollection $roles;
+
+    public function __construct()
+    {
+        $this->roles = new PersistentCollection();
+    }
 
     public function getId(): int
     {
@@ -63,6 +75,28 @@ class User
     {
         $this->mail = $mail;
         return $this;
+    }
+
+    public function getRoles(): PersistentCollection
+    {
+        return $this->roles;
+    }
+
+    public function setRoles(PersistentCollection $roles): User
+    {
+        $this->roles = $roles;
+        return $this;
+    }
+
+    public function addRole(Role $role): User
+    {
+        $this->roles[] = $role;
+        return $this;
+    }
+
+    public function initRoles()
+    {
+        $this->roles = new PersistentCollection();
     }
 
 }

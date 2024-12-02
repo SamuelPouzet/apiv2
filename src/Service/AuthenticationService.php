@@ -33,6 +33,8 @@ class AuthenticationService
                 ->setStatusCode(Result::RESULT_KO);
         }
 
+        $result->setUser($user);
+
         return $result;
     }
 

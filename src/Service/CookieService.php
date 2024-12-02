@@ -2,7 +2,9 @@
 
 namespace SamuelPouzet\Api\Service;
 
+use Laminas\Http\Cookies;
 use Laminas\Http\Header\SetCookie;
+use Laminas\Http\Request;
 
 class CookieService
 {
@@ -12,12 +14,17 @@ class CookieService
     protected ?string $domain = null;
     protected \DateTimeImmutable $expirationDate;
     protected bool $httpOnly = true;
-    protected bool $secure = true;
+    protected bool $secure = false;
     protected ?int $maxAge = null;
     protected ?int $version = null;
     protected ?string $path = null;
     protected string $sameSite = 'None';
 
+    public function getCookieContent(Request $request, string $cookieName): string
+    {
+        $cookie = $request->getCookie();
+        return $cookie && $cookie->offsetExists($cookieName) ? $cookie->offsetGet($cookieName) : '';
+    }
 
     public function addCookie(): SetCookie
     {

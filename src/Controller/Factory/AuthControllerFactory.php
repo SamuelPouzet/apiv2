@@ -15,7 +15,9 @@ class AuthControllerFactory implements FactoryInterface
         return new AuthController(
             $container->get('authentication.service'),
             $container->get('jwt.service'),
-            $container->get('cookie.service')
+            $container->get('cookie.service'),
+            $container->get('auth.token.manager'),
+            $container->get('refresh.token.manager'),
         );
     }
 }
