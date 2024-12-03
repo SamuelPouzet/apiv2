@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Laminas\Router\Http\Literal;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use SamuelPouzet\Api\Controller\AuthController;
+use SamuelPouzet\Api\Controller\ErrorController;
 use SamuelPouzet\Api\Controller\Factory\AuthControllerFactory;
 use SamuelPouzet\Api\Controller\TestController;
 use SamuelPouzet\Api\Entity\User;
@@ -59,6 +60,7 @@ return [
     'controllers' => [
         'factories' => [
             AuthController::class => AuthControllerFactory::class,
+            ErrorController::class => InvokableFactory::class,
             TestController::class => InvokableFactory::class,
         ],
     ],
@@ -167,16 +169,27 @@ return [
     'authorization' => [
         'allowedByDefault' => false,
         'controllers' => [
+            AuthController::class => [
+                'post' => [
+                    'public' => true,
+                ],
+            ],
             IndexController::class => [
                 'getAll' => [
                     'public' => true,
                     'roles' => ['role.admin'],
                 ],
             ],
+            ErrorController::class => [
+                'error' => [
+                    'public' => true,
+                ],
+            ],
             TestController::class => [
                 'getAll' => [
                     'public' => false,
                     'roles' => ['role.modo'],
+                    'permissions' => ['']
                 ],
             ]
         ],

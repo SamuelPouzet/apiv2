@@ -10,6 +10,7 @@ use SamuelPouzet\Api\Manager\RefreshTokenManager;
 use SamuelPouzet\Api\Service\AuthenticationService;
 use SamuelPouzet\Api\Service\CookieService;
 use SamuelPouzet\Api\Service\JWTService;
+use SamuelPouzet\Api\Service\UserService;
 
 // todo override with abstract jsons controller
 class AuthController extends AbstractActionController
@@ -18,6 +19,7 @@ class AuthController extends AbstractActionController
         protected AuthenticationService $authenticationService,
         protected JWTService $JWTService,
         protected CookieService $cookieService,
+        protected UserService $userService,
         protected AuthTokenManager $authTokenManager,
         protected RefreshTokenManager $refreshTokenManager
     ) {
@@ -36,7 +38,7 @@ class AuthController extends AbstractActionController
             ]);
         }
 
-        $user = $granted->getUser();
+        $user = $this->userService->getCurrentUser();
 
         $accessToken = md5(uniqid() . rand(1000000, 9999999));
         $this->authTokenManager->insert($user, $accessToken);

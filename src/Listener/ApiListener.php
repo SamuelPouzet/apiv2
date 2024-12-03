@@ -3,7 +3,10 @@
 namespace SamuelPouzet\Api\Listener;
 
 use Laminas\EventManager\EventManagerInterface;
+use Laminas\Http\Response;
 use Laminas\Mvc\MvcEvent;
+use SamuelPouzet\Api\Adapter\Result;
+use SamuelPouzet\Api\Controller\ErrorController;
 use SamuelPouzet\Api\Exception\MethodNotFoundException;
 use SamuelPouzet\Api\Service\AuthorisationService;
 
@@ -31,10 +34,17 @@ class ApiListener
     {
         $routeMatch = $event->getRouteMatch();
         $method = $this->getAction($event);
-        $controller = $routeMatch->getParam('controller');
         $routeMatch->setParam('action', $method);
         try {
-            $this->authorize($event);
+            $auth = $this->authorize($event);
+
+            if ($auth->getStatusCode() !== Response::STATUS_CODE_200) {
+                $routeMatch->setParam('controller', ErrorController::class);
+                $routeMatch->setParam('action', 'error');
+                $routeMatch->setParam('statusCode', $auth->getStatusCode());
+                $routeMatch->setParam('message', $auth->getMessage());
+                return;
+            }
         } catch (\Exception $e) {
             die('Exception ' . $e->getMessage());
         } catch (\Error $e) {
@@ -59,8 +69,8 @@ class ApiListener
         return $method;
     }
 
-    protected function authorize(MvcEvent $event)
+    protected function authorize(MvcEvent $event): Result
     {
-        $allowed = $this->authorisationService->authorize($event);
+        return $this->authorisationService->authorize($event);
     }
 }

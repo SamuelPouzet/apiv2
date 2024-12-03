@@ -20,10 +20,10 @@ class CookieService
     protected ?string $path = null;
     protected string $sameSite = 'None';
 
-    public function getCookieContent(Request $request, string $cookieName): string
+    public function getCookieContent(Request $request, string $cookieName): ?string
     {
         $cookie = $request->getCookie();
-        return $cookie && $cookie->offsetExists($cookieName) ? $cookie->offsetGet($cookieName) : '';
+        return $cookie && $cookie->offsetExists($cookieName) ? $cookie->offsetGet($cookieName) : null;
     }
 
     public function addCookie(): SetCookie

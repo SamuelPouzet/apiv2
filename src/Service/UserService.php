@@ -9,10 +9,26 @@ use SamuelPouzet\Api\Entity\User;
 
 class UserService
 {
+
+    public ?User $currentUser;
+
     public function __construct(protected EntityManager $entityManager)
     {
     }
 
+    public function getCurrentUser(): ?User
+    {
+        return $this->currentUser;
+    }
+
+    public function setCurrentUser(?User $currentUser): UserService
+    {
+        $this->currentUser = $currentUser;
+        return $this;
+    }
+
+
+    // todo mettre dans un userrepository
     public function getUserByAccssToken(string $token): ?User
     {
         $now = (new \DateTime())->sub(new \DateInterval('PT2H'));

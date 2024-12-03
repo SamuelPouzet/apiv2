@@ -9,7 +9,6 @@ class Result
 
     protected int $statusCode;
     protected string $message;
-    protected ?User $user;
 
     public const RESULT_OK = 1;
     public const RESULT_KO = 0;
@@ -43,14 +42,4 @@ class Result
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): Result
-    {
-        $this->user = $user;
-        return $this;
-    }
 }

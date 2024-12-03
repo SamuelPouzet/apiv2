@@ -9,7 +9,10 @@ use SamuelPouzet\Api\Entity\User;
 
 class AuthenticationService
 {
-    public function __construct(protected EntityManager $entityManager)
+    public function __construct(
+        protected EntityManager $entityManager,
+        protected UserService $userService
+    )
     {
     }
 
@@ -33,7 +36,7 @@ class AuthenticationService
                 ->setStatusCode(Result::RESULT_KO);
         }
 
-        $result->setUser($user);
+        $this->userService->setCurrentUser($user);
 
         return $result;
     }
