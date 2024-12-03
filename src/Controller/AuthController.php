@@ -10,18 +10,16 @@ use SamuelPouzet\Api\Manager\RefreshTokenManager;
 use SamuelPouzet\Api\Service\AuthenticationService;
 use SamuelPouzet\Api\Service\CookieService;
 use SamuelPouzet\Api\Service\JWTService;
+use SamuelPouzet\Api\Service\TokenService;
 use SamuelPouzet\Api\Service\UserService;
 
 // todo override with abstract jsons controller
 class AuthController extends AbstractActionController
 {
     public function __construct(
+        protected TokenService $tokenService,
         protected AuthenticationService $authenticationService,
-        protected JWTService $JWTService,
-        protected CookieService $cookieService,
         protected UserService $userService,
-        protected AuthTokenManager $authTokenManager,
-        protected RefreshTokenManager $refreshTokenManager
     ) {
     }
 
@@ -39,37 +37,7 @@ class AuthController extends AbstractActionController
         }
 
         $user = $this->userService->getCurrentUser();
-
-        $accessToken = md5(uniqid() . rand(1000000, 9999999));
-        $this->authTokenManager->insert($user, $accessToken);
-        $refreshToken = md5(uniqid() . rand(1000000, 9999999));
-        $this->refreshTokenManager->insert($user, $refreshToken);
-
-        // TOKEN AUTH
-        $interval = new \DateInterval('PT5H');
-        $endDate = (new \DateTimeImmutable())
-            ->setTimezone(new \DateTimeZone("UTC"))
-            ->add($interval);
-        $authToken = $this
-            ->JWTService
-            ->build($endDate, [
-                'login' => $posted['login'],
-                'access_token' => $accessToken
-            ])
-            ->toString();
-        $this->authCookie('auth-cookie', $authToken, $endDate);
-
-
-        $interval = new \DateInterval('P6M');
-        $endDate = (new \DateTimeImmutable())->add($interval);
-        $refreshToken = $this
-            ->JWTService
-            ->build($endDate, [
-                'login' => $posted['login'],
-                'refresh_token' => $refreshToken
-            ])
-            ->toString();
-        $this->authCookie('refresh-cookie', $refreshToken, $endDate);
+        $this->tokenService->generate($this->response, $user);
 
         return new JsonModel([
             'login' => $user->getLogin(),
@@ -77,11 +45,4 @@ class AuthController extends AbstractActionController
         ]);
     }
 
-    protected function authCookie(string $name, string $value, \DateTimeImmutable $endDate): void
-    {
-        $this->cookieService->setName($name);
-        $this->cookieService->setValue($value);
-        $this->cookieService->setExpirationDate($endDate);
-        $this->response->getHeaders()->addHeader($this->cookieService->addCookie());
-    }
 }

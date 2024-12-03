@@ -2,11 +2,8 @@
 
 namespace SamuelPouzet\Api\Adapter;
 
-use SamuelPouzet\Api\Entity\User;
-
 class Result
 {
-
     protected int $statusCode;
     protected string $message;
 

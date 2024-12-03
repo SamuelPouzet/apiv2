@@ -9,6 +9,8 @@ use Laminas\ServiceManager\Factory\InvokableFactory;
 use SamuelPouzet\Api\Controller\AuthController;
 use SamuelPouzet\Api\Controller\ErrorController;
 use SamuelPouzet\Api\Controller\Factory\AuthControllerFactory;
+use SamuelPouzet\Api\Controller\Factory\RefreshControllerFactory;
+use SamuelPouzet\Api\Controller\RefreshController;
 use SamuelPouzet\Api\Controller\TestController;
 use SamuelPouzet\Api\Entity\User;
 use SamuelPouzet\Api\Interface\UserInterface;
@@ -26,10 +28,14 @@ use SamuelPouzet\Api\Service\Factory\AuthenticationServiceFactory;
 use SamuelPouzet\Api\Service\Factory\AuthorisationServiceFactory;
 use Application\Controller\IndexController;
 use SamuelPouzet\Api\Service\Factory\JWTServiceFactory;
+use SamuelPouzet\Api\Service\Factory\RefreshServiceFactory;
 use SamuelPouzet\Api\Service\Factory\RoleServiceFactory;
+use SamuelPouzet\Api\Service\Factory\TokenServiceFactory;
 use SamuelPouzet\Api\Service\Factory\UserServiceFactory;
 use SamuelPouzet\Api\Service\JWTService;
+use SamuelPouzet\Api\Service\RefreshService;
 use SamuelPouzet\Api\Service\RoleService;
+use SamuelPouzet\Api\Service\TokenService;
 use SamuelPouzet\Api\Service\UserService;
 
 return [
@@ -55,12 +61,23 @@ return [
                     ],
                 ],
             ],
+            'refresh' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/refresh',
+                    'defaults' => [
+                        'controller' => RefreshController::class,
+                        'action' => 'index',
+                    ],
+                ],
+            ],
         ],
     ],
     'controllers' => [
         'factories' => [
             AuthController::class => AuthControllerFactory::class,
             ErrorController::class => InvokableFactory::class,
+            RefreshController::class => RefreshControllerFactory::class,
             TestController::class => InvokableFactory::class,
         ],
     ],
@@ -80,8 +97,10 @@ return [
             // todo cookieservicefactory pour récupérer de la conf
             CookieService::class => InvokableFactory::class,
             JWTService::class => JWTServiceFactory::class,
+            RefreshService::class => RefreshServiceFactory::class,
             RoleService::class => RoleServiceFactory::class,
             UserService::class => UserServiceFactory::class,
+            TokenService::class => TokenServiceFactory::class,
 
             AuthTokenManager::class => AuthTokenManagerFactory::class,
             RefreshTokenManager::class => RefreshTokenManagerFactory::class,
@@ -93,6 +112,7 @@ return [
             'cookie.service' => CookieService::class,
             'user.service' => UserService::class,
             'role.service' => RoleService::class,
+            'token.service' => TokenService::class,
 
             'auth.token.manager' => AuthTokenManager::class,
             'refresh.token.manager' => RefreshTokenManager::class,
@@ -170,6 +190,11 @@ return [
         'allowedByDefault' => false,
         'controllers' => [
             AuthController::class => [
+                'post' => [
+                    'public' => true,
+                ],
+            ],
+            RefreshController::class => [
                 'post' => [
                     'public' => true,
                 ],

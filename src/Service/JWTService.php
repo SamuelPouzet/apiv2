@@ -62,14 +62,18 @@ class JWTService
 
     public function readJwt(string $tokenContent): ?Token
     {
-        $parser = new Parser(new JoseEncoder());
-        $token = $parser->parse($tokenContent);
+        try {
+            $parser = new Parser(new JoseEncoder());
+            $token = $parser->parse($tokenContent);
 
-        $validator = new Validator();
-        if ($validator->validate($token, new SignedWith($this->algorithm, $this->signingKey))) {
-            return $token;
+            $validator = new Validator();
+            if ($validator->validate($token, new SignedWith($this->algorithm, $this->signingKey))) {
+                return $token;
+            }
+            return null;
+        } catch(\Exception $e) {
+            return null;
         }
-        return null;
     }
 
 }

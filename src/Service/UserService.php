@@ -5,6 +5,7 @@ namespace SamuelPouzet\Api\Service;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use SamuelPouzet\Api\Entity\AuthToken;
+use SamuelPouzet\Api\Entity\RefreshToken;
 use SamuelPouzet\Api\Entity\User;
 
 class UserService
@@ -28,7 +29,7 @@ class UserService
     }
 
 
-    // todo mettre dans un userrepository
+    // todo mettre dans un repository
     public function getUserByAccssToken(string $token): ?User
     {
         $now = (new \DateTime())->sub(new \DateInterval('PT2H'));
@@ -40,6 +41,28 @@ class UserService
             ->from(AuthToken::class, 'a')
             ->join('a.user', 'u')
             ->where('a.authToken = :token')
+            ->andWhere('a.creationDate >= :creation_date')
+            ->setParameter('token', $token)
+            ->setParameter('creation_date', $now)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $token?->getUser() ?? null;
+    }
+
+    // todo mettre dans un repository
+    public function getUserByRefreshToken(string $token): ?User
+    {
+        $now = (new \DateTime())->sub(new \DateInterval('P6M'));
+
+        $token = $this
+            ->entityManager
+            ->createQueryBuilder()
+            ->select('a, u')
+            ->from(RefreshToken::class, 'a')
+            ->join('a.user', 'u')
+            ->where('a.refreshToken = :token')
             ->andWhere('a.creationDate >= :creation_date')
             ->setParameter('token', $token)
             ->setParameter('creation_date', $now)

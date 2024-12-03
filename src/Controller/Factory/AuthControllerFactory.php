@@ -13,12 +13,9 @@ class AuthControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): AuthController
     {
         return new AuthController(
+            $container->get('token.service'),
             $container->get('authentication.service'),
-            $container->get('jwt.service'),
-            $container->get('cookie.service'),
-            $container->get('user.service'),
-            $container->get('auth.token.manager'),
-            $container->get('refresh.token.manager'),
+            $container->get('user.service')
         );
     }
 }
