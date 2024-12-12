@@ -24,6 +24,9 @@ class User implements UserInterface
     #[ORM\Column(name: 'mail')]
     protected string $mail;
 
+    #[ORM\Column(name: 'date_created')]
+    protected \DateTimeImmutable $date_created;
+
     #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: "users")]
     #[ORM\JoinTable(name: "user_role")]
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id")]
@@ -99,6 +102,17 @@ class User implements UserInterface
     public function initRoles()
     {
         $this->roles = new PersistentCollection();
+    }
+
+    public function getDateCreated(): \DateTimeImmutable
+    {
+        return $this->date_created;
+    }
+
+    public function setDateCreated(\DateTimeImmutable $date_created): User
+    {
+        $this->date_created = $date_created;
+        return $this;
     }
 
 }
