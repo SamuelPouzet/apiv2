@@ -14,38 +14,66 @@ final class Version20241212173345 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Constraints and indexes';
+        return 'Tables creation';
     }
 
     public function up(Schema $schema): void
     {
-        $table = $schema->getTable('user');
-        $table->addIndex(['login'], 'user_login_index');
+        $table = $schema->createTable('user');
+        $table->addColumn('id', 'integer', ['unsigned'=>true, 'autoincrement'=>true]);
+        $table->addColumn('login', 'string', ['notnull'=>true, 'length'=>200]);
+        $table->addColumn('password', 'string', ['notnull'=>true]);
+        $table->addColumn('mail', 'string', ['notnull'=>true]);
+        $table->addColumn('date_created', 'datetime', ['notnull'=>true]);
+        $table->setPrimaryKey(['id']);
+        $table->addOption('engine' , 'InnoDB');
 
-        $table = $schema->getTable('auth_token');
-        $table->addIndex(['auth_token'], 'auth_token_index');
+        $table = $schema->createTable('role');
+        $table->addColumn('id', 'integer', ['unsigned'=>true, 'autoincrement'=>true]);
+        $table->addColumn('name', 'string', ['notnull'=>true, 'length'=>100]);
+        $table->addColumn('code', 'string', ['notnull'=>true, 'length'=>200]);
+        $table->setPrimaryKey(['id']);
+        $table->addOption('engine' , 'InnoDB');
 
-        $table = $schema->getTable('refresh_token');
-        $table->addIndex(['refresh_token'], 'refresh_token_index');
+        $table = $schema->createTable('user_role');
+        $table->addColumn('id', 'integer', ['unsigned'=>true, 'autoincrement'=>true]);
+        $table->addColumn('user_id', 'integer', ['notnull'=>true]);
+        $table->addColumn('role_id', 'integer', ['notnull'=>true]);
+        $table->setPrimaryKey(['id']);
+        $table->addOption('engine' , 'InnoDB');
 
-        $table = $schema->getTable('user_role');
-        $table->addIndex(['user_id', 'role_id'], 'user_role_index');
+        $table = $schema->createTable('role_hierarchy');
+        $table->addColumn('id', 'integer', ['unsigned'=>true, 'autoincrement'=>true]);
+        $table->addColumn('parent_id', 'integer', ['notnull'=>true]);
+        $table->addColumn('child_id', 'integer', ['notnull'=>true]);
+        $table->setPrimaryKey(['id']);
+        $table->addOption('engine' , 'InnoDB');
+
+        $table = $schema->createTable('auth_token');
+        $table->addColumn('id', 'integer', ['unsigned'=>true, 'autoincrement'=>true]);
+        $table->addColumn('user_id', 'integer', ['notnull'=>true]);
+        $table->addColumn('auth_token', 'string', ['notnull'=>true, 'length'=>250]);
+        $table->addColumn('creation_date', 'datetime', ['notnull'=>true]);
+        $table->setPrimaryKey(['id']);
+        $table->addOption('engine' , 'InnoDB');
+
+        $table = $schema->createTable('refresh_token');
+        $table->addColumn('id', 'integer', ['unsigned'=>true, 'autoincrement'=>true]);
+        $table->addColumn('user_id', 'integer', ['notnull'=>true]);
+        $table->addColumn('refresh_token', 'string', ['notnull'=>true, 'length'=>250]);
+        $table->addColumn('creation_date', 'datetime', ['notnull'=>true]);
+        $table->setPrimaryKey(['id']);
+        $table->addOption('engine' , 'InnoDB');
 
     }
 
     public function down(Schema $schema): void
     {
-        $table = $schema->getTable('user');
-        $table->dropIndex('user_login_index');
-
-        $table = $schema->getTable('auth_token');
-        $table->dropIndex('auth_token_index');
-
-        $table = $schema->getTable('refresh_token');
-        $table->dropIndex('refresh_token_index');
-
-        $table = $schema->getTable('user_role');
-        $table->dropIndex('user_role_index');
-
+        $schema->dropTable('user');
+        $schema->dropTable('role');
+        $schema->dropTable('user_role');
+        $schema->dropTable('role_hierarchy');
+        $schema->dropTable('auth_token');
+        $schema->dropTable('refresh_token');
     }
 }
