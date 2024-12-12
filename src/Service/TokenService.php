@@ -62,7 +62,7 @@ class TokenService
         $this->cookieService->setValue($value);
         $this->cookieService->setExpirationDate($endDate);
 
-        $response->getHeaders()->removeHeader($this->cookieService->addCookie());
+        // $response->getHeaders()->removeHeader($this->cookieService->addCookie());
         $response->getHeaders()->addHeader($this->cookieService->addCookie());
     }
 }

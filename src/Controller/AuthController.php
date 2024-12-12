@@ -2,6 +2,7 @@
 
 namespace SamuelPouzet\Api\Controller;
 
+use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use SamuelPouzet\Api\Adapter\Result;
@@ -30,8 +31,9 @@ class AuthController extends AbstractActionController
         // todo check si les infos sont correctes dans le json
         $granted = $this->authenticationService->authenticate($posted['login'], $posted['password']);
         if ($granted->getStatusCode() === Result::RESULT_KO) {
+            $this->getResponse()->setStatusCode(Response::STATUS_CODE_400);
             return new JsonModel([
-                'status' => 0,
+                'status' => Response::STATUS_CODE_400,
                 'user' => null,
             ]);
         }

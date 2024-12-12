@@ -9,7 +9,9 @@ use Laminas\ServiceManager\Factory\InvokableFactory;
 use SamuelPouzet\Api\Controller\AuthController;
 use SamuelPouzet\Api\Controller\ErrorController;
 use SamuelPouzet\Api\Controller\Factory\AuthControllerFactory;
+use SamuelPouzet\Api\Controller\Factory\LogoutControllerFactory;
 use SamuelPouzet\Api\Controller\Factory\RefreshControllerFactory;
+use SamuelPouzet\Api\Controller\LogoutController;
 use SamuelPouzet\Api\Controller\RefreshController;
 use SamuelPouzet\Api\Controller\TestController;
 use SamuelPouzet\Api\Entity\User;
@@ -61,6 +63,16 @@ return [
                     ],
                 ],
             ],
+            'logout' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/logout',
+                    'defaults' => [
+                        'controller' => LogoutController::class,
+                        'action' => 'index',
+                    ],
+                ],
+            ],
             'refresh' => [
                 'type' => Literal::class,
                 'options' => [
@@ -76,6 +88,7 @@ return [
     'controllers' => [
         'factories' => [
             AuthController::class => AuthControllerFactory::class,
+            LogoutController::class => LogoutControllerFactory::class,
             ErrorController::class => InvokableFactory::class,
             RefreshController::class => RefreshControllerFactory::class,
             TestController::class => InvokableFactory::class,
@@ -146,7 +159,7 @@ return [
         'entity_resolver' => [
             'orm_default' => [
                 'resolvers' => [
-                    
+                    UserInterface::class => User::class,
                 ]
             ],
         ],
@@ -190,6 +203,11 @@ return [
         'allowedByDefault' => false,
         'controllers' => [
             AuthController::class => [
+                'post' => [
+                    'public' => true,
+                ],
+            ],
+            LogoutController::class => [
                 'post' => [
                     'public' => true,
                 ],

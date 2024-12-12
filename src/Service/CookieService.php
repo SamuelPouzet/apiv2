@@ -18,7 +18,7 @@ class CookieService
     protected ?int $maxAge = null;
     protected ?int $version = null;
     protected ?string $path = null;
-    protected string $sameSite = 'None';
+    protected string $sameSite = 'Lax';
 
     public function getCookieContent(Request $request, string $cookieName): ?string
     {

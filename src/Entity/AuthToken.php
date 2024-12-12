@@ -4,6 +4,7 @@ namespace SamuelPouzet\Api\Entity;
 
 
 use Doctrine\ORM\Mapping as ORM;
+use SamuelPouzet\Api\Interface\UserInterface;
 
 #[ORM\Entity(readOnly: false)]
 #[ORM\Table(name: 'auth_token')]
@@ -15,9 +16,9 @@ class AuthToken
     #[ORM\Column(name: 'id')]
     protected int $id;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: UserInterface::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
-    protected User $user;
+    protected UserInterface $user;
 
     #[ORM\Column(name: 'auth_token')]
     protected string $authToken;
@@ -36,12 +37,12 @@ class AuthToken
         return $this;
     }
 
-    public function getUser(): User
+    public function getUser(): UserInterface
     {
         return $this->user;
     }
 
-    public function setUser(User $user): AuthToken
+    public function setUser(UserInterface $user): AuthToken
     {
         $this->user = $user;
         return $this;

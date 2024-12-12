@@ -27,8 +27,7 @@ class JWTService
     public function __construct(protected array $config)
     {
         $this->signingKey =
-            InMemory::base64Encoded($this->config['payload'] ?? 'mBC5v1sOKVvbdEitdSBenu59nfNfhwkedkJVNabosTw=')
-        ;
+            InMemory::base64Encoded($this->config['payload'] ?? 'mBC5v1sOKVvbdEitdSBenu59nfNfhwkedkJVNabosTw=');
 
         $this->algorithm = new Sha256();
     }
@@ -38,7 +37,7 @@ class JWTService
         /**
          * @var BuilderInterface
          */
-         $tokenBuilder = new Builder(new JoseEncoder(), ChainedFormatter::default());
+        $tokenBuilder = new Builder(new JoseEncoder(), ChainedFormatter::default());
 
 
         foreach ($claims as $key => $value) {
@@ -62,18 +61,14 @@ class JWTService
 
     public function readJwt(string $tokenContent): ?Token
     {
-        try {
-            $parser = new Parser(new JoseEncoder());
-            $token = $parser->parse($tokenContent);
+        $parser = new Parser(new JoseEncoder());
+        $token = $parser->parse($tokenContent);
 
-            $validator = new Validator();
-            if ($validator->validate($token, new SignedWith($this->algorithm, $this->signingKey))) {
-                return $token;
-            }
-            return null;
-        } catch(\Exception $e) {
-            return null;
+        $validator = new Validator();
+        if ($validator->validate($token, new SignedWith($this->algorithm, $this->signingKey))) {
+            return $token;
         }
+        return null;
     }
 
 }

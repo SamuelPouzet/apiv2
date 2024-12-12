@@ -7,6 +7,8 @@ use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use SamuelPouzet\Api\Adapter\Result;
+use SamuelPouzet\Api\Entity\AuthToken;
+use SamuelPouzet\Api\Entity\RefreshToken;
 use SamuelPouzet\Api\Entity\User;
 use SamuelPouzet\Api\Manager\AuthTokenManager;
 use SamuelPouzet\Api\Manager\RefreshTokenManager;
@@ -40,20 +42,33 @@ class RefreshController extends AbstractActionController
                 throw new \Exception('token not valid');
             }
             $content = $this->JWTService->readJwt($jwt);
+            $tokenValue = $content->claims()->get('refresh_token');
+
+            //revoke old token
+            $oldToken = $this
+                ->entityManager
+                ->getRepository(RefreshToken::class)->findOneBy(['refreshToken' => $tokenValue]);
+
+            if (! $oldToken) {
+                throw new \Exception('invalid token');
+            }
+
+            $this->entityManager->remove($oldToken);
+
+
             $user = $this
                 ->userService
-                ->getUserByRefreshToken($content->claims()->get('refresh_token'));
+                ->getUserByRefreshToken($tokenValue);
 
             if (! $user) {
                 throw new \Exception('invalid user');
             }
 
             $this->tokenService->generate($this->response, $user);
-
+            $this->entityManager->flush();
         } catch (\Exception $exception) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_403);
             $message = $exception->getMessage();
-            die($exception->getMessage());
         }
 
         return new JsonModel([

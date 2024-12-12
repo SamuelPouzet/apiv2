@@ -3,10 +3,11 @@
 namespace SamuelPouzet\Api\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
+use SamuelPouzet\Api\Interface\UserInterface;
 
 #[ORM\Entity(readOnly: false)]
 #[ORM\Table(name: 'user')]
-class User
+class User implements UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -38,7 +39,7 @@ class User
         return $this->id;
     }
 
-    public function setId(int $id): User
+    public function setId(int $id): static
     {
         $this->id = $id;
         return $this;
@@ -49,7 +50,7 @@ class User
         return $this->login;
     }
 
-    public function setLogin(string $login): User
+    public function setLogin(string $login): static
     {
         $this->login = $login;
         return $this;
@@ -60,7 +61,7 @@ class User
         return $this->password;
     }
 
-    public function setPassword(string $password): User
+    public function setPassword(string $password): static
     {
         $this->password = $password;
         return $this;
@@ -71,7 +72,7 @@ class User
         return $this->mail;
     }
 
-    public function setMail(string $mail): User
+    public function setMail(string $mail): static
     {
         $this->mail = $mail;
         return $this;
@@ -82,7 +83,7 @@ class User
         return $this->roles;
     }
 
-    public function setRoles(PersistentCollection $roles): User
+    public function setRoles(PersistentCollection $roles): static
     {
         $this->roles = $roles;
         return $this;

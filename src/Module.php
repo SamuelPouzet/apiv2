@@ -7,10 +7,11 @@ class Module
     public function getConfig(): array
     {
 
-        // $this->cors();
+        $this->cors();
         return include dirname(__DIR__) . '/config/module.config.php';
     }
 
+    //todo create cors module
     protected function cors()
     {
 
