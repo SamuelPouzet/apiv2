@@ -57,7 +57,8 @@ class TokenService
         string $name,
         string $value,
         \DateTimeImmutable $endDate
-    ): void {
+    ): void
+    {
         $this->cookieService->setName($name);
         $this->cookieService->setValue($value);
         $this->cookieService->setExpirationDate($endDate);

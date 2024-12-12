@@ -55,7 +55,6 @@ class RefreshController extends AbstractActionController
 
             $this->entityManager->remove($oldToken);
 
-
             $user = $this
                 ->userService
                 ->getUserByRefreshToken($tokenValue);

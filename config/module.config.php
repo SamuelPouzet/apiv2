@@ -150,10 +150,21 @@ return [
     'doctrine' => [
         'migrations_configuration' => [
             'orm_default' => [
-                'directory' => __DIR__ . '/../data/Migrations',
-                'name' => 'Doctrine Database Migrations',
-                'namespace' => 'Migrations',
-                'table' => 'migrations',
+                'table_storage' => [
+                    'table_name' => 'DoctrineMigrationVersions',
+                    'version_column_name' => 'version',
+                    'version_column_length' => 191,
+                    'executed_at_column_name' => 'executedAt',
+                    'execution_time_column_name' => 'executionTime',
+                ],
+                'migrations_paths' => [
+                    "Migrations" => __DIR__ . '/../data/Migrations',
+                ], // an array of namespace => path
+                'migrations' => [], // an array of fully qualified migrations
+                'all_or_nothing' => false,
+                'check_database_platform' => true,
+                'organize_migrations' => 'year', // year or year_and_month
+                'custom_template' => null,
             ],
         ],
         'entity_resolver' => [

@@ -1,6 +1,7 @@
 <?php
 
 namespace SamuelPouzet\Api\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use SamuelPouzet\Api\Interface\UserInterface;
