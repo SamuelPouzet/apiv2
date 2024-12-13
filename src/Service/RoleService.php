@@ -3,6 +3,7 @@
 namespace SamuelPouzet\Api\Service;
 
 use Doctrine\ORM\EntityManager;
+use Laminas\Cache\Storage\StorageInterface;
 use SamuelPouzet\Api\Entity\Role;
 use SamuelPouzet\Api\Entity\User;
 
@@ -10,7 +11,10 @@ class RoleService
 {
     protected array $roles;
 
-    public function __construct(protected EntityManager $entityManager)
+    public function __construct(
+        protected EntityManager $entityManager,
+        protected StorageInterface $cache
+    )
     {
     }
 
@@ -34,17 +38,19 @@ class RoleService
 
     public function generateRoles(): array
     {
-        // todo mettre les roles en cache pour gagner lourdement en perfs
         if (isset($this->roles)) {
             return $this->roles;
         }
 
-        $this->roles = [];
-        $entities = $this->entityManager->getRepository(Role::class)->findAll();
-        foreach ($entities as $entity) {
-            $this->roles[$entity->getCode()] = $this->parseChildren($entity);
-        }
+        $this->roles = $this->cache->getItem('rbac_container', $result) ?? [];
+        if (! $result) {
+            $entities = $this->entityManager->getRepository(Role::class)->findAll();
+            foreach ($entities as $entity) {
+                $this->roles[$entity->getCode()] = $this->parseChildren($entity);
+            }
 
+            $this->cache->addItem('rbac_container', $this->roles);
+        }
         return $this->roles;
     }
 

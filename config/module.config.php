@@ -4,6 +4,7 @@ namespace SamuelPouzet\Api;
 
 use Doctrine\DBAL\Driver\PDO\MySQL\Driver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
+use Laminas\Cache\Storage\Plugin\Serializer;
 use Laminas\Router\Http\Literal;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use SamuelPouzet\Api\Controller\AuthController;
@@ -39,6 +40,7 @@ use SamuelPouzet\Api\Service\RefreshService;
 use SamuelPouzet\Api\Service\RoleService;
 use SamuelPouzet\Api\Service\TokenService;
 use SamuelPouzet\Api\Service\UserService;
+use Laminas\Cache\Storage\Adapter\Filesystem;
 
 return [
     'router' => [
@@ -158,7 +160,7 @@ return [
                     'execution_time_column_name' => 'executionTime',
                 ],
                 'migrations_paths' => [
-                    "Migrations" => __DIR__ . '/../data/Migrations',
+                    "Migrations" => dirname(__DIR__, 1) . '/data/Migrations',
                 ], // an array of namespace => path
                 'migrations' => [], // an array of fully qualified migrations
                 'all_or_nothing' => false,
@@ -201,12 +203,27 @@ return [
             __NAMESPACE__ . '_driver' => [
                 'class' => AttributeDriver::class,
                 'cache' => 'array',
-                'paths' => [__DIR__ . '/../src/Entity']
+                'paths' => [dirname(__DIR__, 1) . '/src/Entity']
             ],
             'orm_default' => [
                 'drivers' => [
                     __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_driver'
                 ],
+            ],
+        ],
+    ],
+    'caches' => [
+        'default-cache' => [
+            'adapter' => Filesystem::class,
+            'plugins' => [
+                [
+                    'name' => Serializer::class,
+                    'options' => [
+                    ],
+                ],
+            ],
+            'options' => [
+                'cache_dir' => dirname(__DIR__, 1) . '/data/cache',
             ],
         ],
     ],
